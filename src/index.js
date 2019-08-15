@@ -37,7 +37,6 @@ const Question = () =>{
   },[]);
 
   const handleGuessSubmit = (event) =>{
-    countryname();
     event.preventDefault();
     const country = getRandomCountry();
 
@@ -51,7 +50,6 @@ const Question = () =>{
 
       setGuessedCountries(() => guessedCountries.concat(country.name));
       console.log(guessedCountries);
-      console.log(displayDandomCountry);
     }else{
       handleGuessSubmit(event)
     }
@@ -60,13 +58,14 @@ const Question = () =>{
 
   const countryname = () =>{
     const country = getRandomCountry();
-
     if(!guessedCountries.includes(country.name)){
       setDisplayRandomCountry(country.name)
     }else{
       countryname()
     }
   };
+
+  
 
   return(
     <div>
