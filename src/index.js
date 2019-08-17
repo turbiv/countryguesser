@@ -19,57 +19,60 @@ const Question = () =>{
   const [countries, setCountries] = useState([]);
   const [guessedCountries, setGuessedCountries] = useState([]);
   const [guessValue, setGuessValue] = useState('');
-  const [displayDandomCountry, setDisplayRandomCountry] = useState("");
+  const [displayRandomCountry, setDisplayRandomCountry] = useState("asd");
 
   const handleUsernameChange = (event) =>{
     setGuessValue(event.target.value)
   };
 
-  const getRandomCountry = () =>{
-    const randomcountryindex = Math.floor(Math.random() * countries.length);
-    return countries[randomcountryindex];
-  };
-
   useEffect(() =>{
     Countries
       .getCountries()
-      .then(response => setCountries(response));
+      .then(response => {
+        const randomcountryindex = Math.floor(Math.random() * response.length);
+        console.log("Get random country")
+        console.log(response[randomcountryindex])
+        setCountries(response)
+        return setDisplayRandomCountry(response[randomcountryindex])
+      });
   },[]);
 
   const handleGuessSubmit = (event) =>{
     event.preventDefault();
-    const country = getRandomCountry();
+    console.log("asd");
+    console.log(displayRandomCountry);
 
-    if(!guessedCountries.includes(country.name)){
+    if(!guessedCountries.includes(displayRandomCountry.name)){
 
-      if(guessValue.toLowerCase() === country.name.toLowerCase()){
+      if(guessValue.toLowerCase() === displayRandomCountry.name.toLowerCase()){
+        getnewcountry();
         console.log("Guess was correct!")
       }else{
+        getnewcountry();
         console.log("Guess was incorrect :(")
       }
 
-      setGuessedCountries(() => guessedCountries.concat(country.name));
-      console.log(guessedCountries);
-    }else{
-      handleGuessSubmit(event)
+      setGuessedCountries(() => guessedCountries.concat(displayRandomCountry.name));
     }
     setGuessValue("")
   };
 
-  const countryname = () =>{
-    const country = getRandomCountry();
+  const getnewcountry = () =>{
+    const randomcountryindex = Math.floor(Math.random() * countries.length);
+    const country = countries[randomcountryindex];
+    console.log(guessedCountries)
     if(!guessedCountries.includes(country.name)){
-      setDisplayRandomCountry(country.name)
+      setDisplayRandomCountry(country)
     }else{
-      countryname()
+      getnewcountry()
     }
   };
 
-  
+
 
   return(
     <div>
-      <p>Current question</p>
+      <p>Current question:</p>
       <GetUsername submit={handleGuessSubmit} change={handleUsernameChange} val={guessValue}/>
     </div>
   );
