@@ -19,7 +19,7 @@ const Question = () =>{
   const [countries, setCountries] = useState([]);
   const [guessedCountries, setGuessedCountries] = useState([]);
   const [guessValue, setGuessValue] = useState('');
-  const [displayRandomCountry, setDisplayRandomCountry] = useState("asd");
+  const [displayRandomCountry, setDisplayRandomCountry] = useState("");
 
   const handleUsernameChange = (event) =>{
     setGuessValue(event.target.value)
@@ -72,7 +72,7 @@ const Question = () =>{
 
   return(
     <div>
-      <p>Current question:</p>
+      <p>Current question {displayRandomCountry.name}</p>
       <GetUsername submit={handleGuessSubmit} change={handleUsernameChange} val={guessValue}/>
     </div>
   );
