@@ -5,7 +5,7 @@ const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const Person = require('./models/mongo');
+const Score = require('./models/mongo');
 
 app.use(cors());
 
@@ -13,7 +13,7 @@ morgan.token('persondetails', () => false);
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :persondetails'));
 app.use(bodyParser.json());
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/scores/', (request, response) => {
   Person.findById(request.params.id)
     .then(person => {
       if (person) {
@@ -25,6 +25,25 @@ app.get('/api/persons/:id', (request, response) => {
     .catch(error => {
       console.log(error);
       response.status(400).send({error: 'malformatted id'})})
+});
+
+app.post('/api/scores', (request, response) =>{
+  const bodycontent = request.body;
+
+  if (!bodycontent.name || !bodycontent.score) {
+    return response.status(400).json({ error: "Name or number is missing" });
+  }
+
+  const newScore = new Score({
+    name: bodycontent.name,
+    correct: bodycontent.correct,
+    wrong: bodycontent.wrong
+  });
+
+  newScore
+    .save()
+    .then(saved => response.json(saved.toJSON()));
+
 });
 
 const errorHandler = (error, request, response, next) =>{

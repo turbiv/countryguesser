@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import ReactDOM from "react-dom";
 import Countries from './services/countryService'
+import ReactNotification from 'react-notifications-component'
+import 'react-notifications-component/dist/theme.css'
+import { store } from 'react-notifications-component';
 
 const GetAnswer = ({submit, change, val}) =>{
   return(
@@ -15,25 +18,6 @@ const GetAnswer = ({submit, change, val}) =>{
   )
 };
 
-const GuessNotification = ({text, correct}) =>{
-  if(text === null){
-    return null
-  }
-
-  const color = correct ? "green" : "red";
-
-  const notificationStyle = {
-    color: color
-  };
-
-  return(
-    <div style={notificationStyle}>
-      <p>{text}</p>
-    </div>
-  );
-
-};
-
 const Question = () =>{
   const [countries, setCountries] = useState([]);
   const [guessedCountries, setGuessedCountries] = useState([]);
@@ -41,8 +25,7 @@ const Question = () =>{
   const [displayRandomCountry, setDisplayRandomCountry] = useState("");
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
-  const [notificationText , setNotificationText] = useState("");
-  const [isCorrect, setIsCorrect] = useState("");
+  const [progress, setProgress] = useState({"correct":0, "wrong":0});
 
   const handleUsernameChange = (event) =>{
     setGuessValue(event.target.value)
@@ -58,6 +41,7 @@ const Question = () =>{
 
   useEffect(() =>{
     Countries
+
       .getCountries()
       .then(response => {
         const randomcountryindex = Math.floor(Math.random() * response.length);
@@ -76,24 +60,43 @@ const Question = () =>{
     console.log(displayRandomCountry);
     console.log(question);
     console.log(answer);
+    console.log(progress);
     console.log("-----");
 
     if(!guessedCountries.includes(displayRandomCountry.name)){
 
       if(guessValue.toLowerCase() === displayRandomCountry.name.toLowerCase()){
-        getnewcountry();
+        const newProgess = {
+          ...progress,
+          correct: progress.correct +1
+        };
+        setProgress(newProgess);
         console.log("Guess was correct!")
       }else{
-        getnewcountry();
-        setNotificationText(`The correct answer was: ${answer}`);
-        setIsCorrect(false);
-        setTimeout(() =>{
-          setNotificationText(null);
-        }, 5000);
+        const newProgess = {
+          ...progress,
+          wrong: progress.wrong +1
+        };
+        setProgress(newProgess);
+        store.addNotification({
+          title: "Wrong answer",
+          message: `The correct answer was: ${answer}`,
+          type: "danger",
+          insert: "top",
+          container: "top-right",
+          animationIn: ["animated", "fadeIn"],
+          animationOut: ["animated", "fadeOut"],
+          width: 300,
+          dismiss: {
+            duration: 5000,
+            onScreen: true
+          }
+        });
         console.log("Guess was incorrect :(")
       }
+      getnewcountry();
 
-      setGuessedCountries(() => guessedCountries.concat(displayRandomCountry.name));
+      setGuessedCountries(guessedCountries.concat(displayRandomCountry.name));
     }else{
       getnewcountry();
     }
@@ -103,6 +106,7 @@ const Question = () =>{
   const getnewcountry = () =>{
     const randomcountryindex = Math.floor(Math.random() * countries.length);
     const country = countries[randomcountryindex];
+    console.log(guessedCountries);
     if(!guessedCountries.includes(country.name)){
       setDisplayRandomCountry(country);
       handleQandA(country)
@@ -113,8 +117,8 @@ const Question = () =>{
 
   return(
     <div>
-      <GuessNotification text={notificationText} correct={isCorrect}/>
-      <RenderQuestion question={question} guessValue={guessValue} guesshandle={handleGuessSubmit} change={handleUsernameChange} country={displayRandomCountry.name} guessedlistlength={guessedCountries.length}/>
+      <ReactNotification/>
+      <RenderQuestion progress={progress} question={question} guessValue={guessValue} guesshandle={handleGuessSubmit} change={handleUsernameChange} country={displayRandomCountry.name} guessedlistlength={guessedCountries.length}/>
     </div>
   );
 };
@@ -124,6 +128,8 @@ const RenderQuestion = (props) =>{
     return(
       <div>
         <p>Game over</p>
+        <p>Results</p>
+        <p>Correct: {props.progress.correct} Wrong: {props.progress.wrong}</p>
       </div>
     )
   }else{

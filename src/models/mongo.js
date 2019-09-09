@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 
-const password = process.env.password; //Either have a env variable with a password or manually type it in
+const password = ""; //Either have a env variable with a password or manually type it in
 const url = `mongodb+srv://fullstack:${password}@cluster0-vgh1b.mongodb.net/fullstack?retryWrites=true&w=majority`;
 console.log(url);
 
@@ -16,14 +16,17 @@ const scoreSchema = mongoose.Schema({
     type: String,
     minlength: 3
   },
-  number: {
+  correct: {
+    type: String
+  },
+  wrong:{
     type: String
   }
 });
 
-phoneSchema.plugin(uniqueValidator);
+scoreSchema.plugin(uniqueValidator);
 
-phoneSchema.set('toJSON', {
+scoreSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString();
     delete returnedObject._id;
@@ -31,4 +34,4 @@ phoneSchema.set('toJSON', {
   }
 });
 
-module.exports = mongoose.model('Person', phoneSchema);
+module.exports = mongoose.model('Score', scoreSchema);
