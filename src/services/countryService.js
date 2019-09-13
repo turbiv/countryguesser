@@ -12,4 +12,9 @@ const addScore = score =>{
   return addscore.then(response => response.data)
 };
 
-export default {getCountries, addScore}
+const getScores = () =>{
+  const scores = axios.get(mongourl);
+  return scores.then(response => response.data)
+};
+
+export default {getCountries, addScore, getScores}

@@ -5,7 +5,7 @@ import ReactNotification from 'react-notifications-component'
 import 'react-notifications-component/dist/theme.css'
 import { store } from 'react-notifications-component';
 
-const GetAnswer = ({submit, change, val}) =>{
+const SetSubmit = ({submit, change, val}) =>{
   return(
     <form onSubmit={submit}>
       <div>
@@ -124,12 +124,42 @@ const Question = () =>{
 };
 
 const RenderQuestion = (props) =>{
+  const [name, setName] = useState("");
+  const [currentScores, setCurrentScores] = useState([]);
+
+  useEffect(()=>{
+    Countries
+      .getScores()
+      .then(response => setCurrentScores(response));
+  },[]);
+
+  const handleNameChange = event =>{
+    setName(event.target.value)
+  };
+
+  const handleScoreSubmit = event =>{
+    event.preventDefault();
+    const addscore = {
+      name: name,
+      results: props.progress
+    };
+    Countries
+      .addScore(addscore)
+      .then(response => setCurrentScores(currentScores.concat(response)))
+  };
+
   if(props.guessedlistlength === 20){
     return(
       <div>
+        <div>
         <p>Game over</p>
         <p>Results</p>
         <p>Correct: {props.progress.correct} Wrong: {props.progress.wrong}</p>
+        </div>
+        <div>
+          <SetSubmit submit={handleScoreSubmit} change={handleNameChange} val={name}/>
+          {currentScores.map((score, i) => <p key={i}>Name: {score.name} Correct: {score.results.correct} Wrong: {score.results.wrong}</p>)}
+        </div>
       </div>
     )
   }else{
@@ -137,7 +167,7 @@ const RenderQuestion = (props) =>{
       <div>
         <p>Question:{props.guessedlistlength}/20</p>
         <p>What is the {props.question} of {props.country}</p>
-        <GetAnswer submit={props.guesshandle} change={props.change} val={props.guessValue}/>
+        <SetSubmit submit={props.guesshandle} change={props.change} val={props.guessValue}/>
       </div>
     )
   }

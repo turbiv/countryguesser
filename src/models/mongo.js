@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
-const uniqueValidator = require('mongoose-unique-validator');
 
-const password = ""; //Either have a env variable with a password or manually type it in
+const password = "df478444"; //Either have a env variable with a password or manually type it in
 const url = `mongodb+srv://fullstack:${password}@cluster0-vgh1b.mongodb.net/fullstack?retryWrites=true&w=majority`;
 console.log(url);
 
@@ -16,15 +15,16 @@ const scoreSchema = mongoose.Schema({
     type: String,
     minlength: 3
   },
-  correct: {
-    type: String
-  },
-  wrong:{
-    type: String
+  results:{
+    correct: {
+      type: Number
+    },
+    wrong:{
+      type: Number
+    }
   }
-});
 
-scoreSchema.plugin(uniqueValidator);
+});
 
 scoreSchema.set('toJSON', {
   transform: (document, returnedObject) => {

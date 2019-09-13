@@ -13,31 +13,23 @@ morgan.token('persondetails', () => false);
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :persondetails'));
 app.use(bodyParser.json());
 
-app.get('/api/scores/', (request, response) => {
-  Person.findById(request.params.id)
-    .then(person => {
-      if (person) {
-        response.json(person.toJSON())
-      }else{
-        response.status(404).end()
-      }
-    })
-    .catch(error => {
-      console.log(error);
-      response.status(400).send({error: 'malformatted id'})})
+app.get('/api/scores', (request, response) => {
+  Score.find({}).then(scores =>{
+    response.json(scores.map(score => score.toJSON()))
+  })
+    .catch(error => console.log(error))
 });
 
 app.post('/api/scores', (request, response) =>{
   const bodycontent = request.body;
-
-  if (!bodycontent.name || !bodycontent.score) {
-    return response.status(400).json({ error: "Name or number is missing" });
-  }
+  console.log(bodycontent)
 
   const newScore = new Score({
     name: bodycontent.name,
-    correct: bodycontent.correct,
-    wrong: bodycontent.wrong
+    results:{
+      correct: bodycontent.results.correct,
+      wrong: bodycontent.results.wrong
+    }
   });
 
   newScore
