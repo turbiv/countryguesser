@@ -26,6 +26,7 @@ const Question = () =>{
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [progress, setProgress] = useState({"correct":0, "wrong":0});
+  const [isOnline, setIsOnline] = useState(false);
 
   const handleUsernameChange = (event) =>{
     setGuessValue(event.target.value)
@@ -49,6 +50,7 @@ const Question = () =>{
         console.log("Get random country");
         console.log(response[randomcountryindex]);
         setCountries(response);
+        setIsOnline(true);
         return setDisplayRandomCountry(response[randomcountryindex])
       });
   },[]);
@@ -64,7 +66,9 @@ const Question = () =>{
     console.log("-----");
 
     if(!guessedCountries.includes(displayRandomCountry.name)){
-
+      if(guessValue === undefined){
+        getnewcountry();
+      }
       if(guessValue.toLowerCase() === displayRandomCountry.name.toLowerCase()){
         const newProgess = {
           ...progress,
@@ -115,22 +119,34 @@ const Question = () =>{
     }
   };
 
-  return(
-    <div>
-      <ReactNotification/>
-      <RenderQuestion progress={progress} question={question} guessValue={guessValue} guesshandle={handleGuessSubmit} change={handleUsernameChange} country={displayRandomCountry.name} guessedlistlength={guessedCountries.length}/>
-    </div>
-  );
+  if(isOnline) {
+    return (
+      <div>
+        <ReactNotification/>
+        <RenderQuestion progress={progress} question={question} guessValue={guessValue} guesshandle={handleGuessSubmit}
+                        change={handleUsernameChange} country={displayRandomCountry.name}
+                        guessedlistlength={guessedCountries.length}/>
+      </div>
+    );
+  }else{
+    return(<div>
+      <p>Loading...</p>
+    </div>);
+  }
 };
 
 const RenderQuestion = (props) =>{
   const [name, setName] = useState("");
   const [currentScores, setCurrentScores] = useState([]);
+  const [submitted, setSubmitted] = useState(false);
+  const [isOnline, setIsOnline] = useState(false);
+  const [selectedPage, setSelectedPage] = useState(0);
 
   useEffect(()=>{
     Countries
       .getScores()
-      .then(response => setCurrentScores(response));
+      .then(response => setCurrentScores(response))
+      .then(()=> setIsOnline(true));
   },[]);
 
   const handleNameChange = event =>{
@@ -138,6 +154,8 @@ const RenderQuestion = (props) =>{
   };
 
   const handleScoreSubmit = event =>{
+    console.log("Handle score submit");
+    handleAllResults();
     event.preventDefault();
     const addscore = {
       name: name,
@@ -146,9 +164,56 @@ const RenderQuestion = (props) =>{
     Countries
       .addScore(addscore)
       .then(response => setCurrentScores(currentScores.concat(response)))
+      .then(response => setSubmitted(true))
+  };
+
+  const handlePlayerSubmit = () =>{
+    if(submitted){
+      return <p>Cannot submit a result more than once</p>
+    }else{
+      return <SetSubmit submit={handleScoreSubmit} change={handleNameChange} val={name}/>
+    }
+  };
+
+  const handleAllResults = () =>{
+    var pageScores = [];
+    var allPageScores = [];
+    currentScores.map((score, i) => {
+      if ((i % 2) === 0 && i !== 0){
+        allPageScores.push(pageScores);
+        console.log("allscres", allPageScores);
+        console.log("pagescores", pageScores);
+        pageScores = []
+      }
+      pageScores.push(<p key={i}>Name: {score.name} Correct: {score.results.correct} Wrong: {score.results.wrong}</p>);
+    });
+    allPageScores.push(pageScores);
+    console.log("ALL PAGE SCORES");
+    console.log(allPageScores);
+    return allPageScores
+  };
+
+  const handlePages = (selected) =>{
+    const allResults = handleAllResults();
+    return allResults[selected]
+  };
+
+  const PlayerResults = () =>{
+    if(isOnline) {
+      return (
+        <div>
+          {handlePlayerSubmit()}
+          {handlePages(selectedPage).map((result) => result)}
+          {handleAllResults().map((n, index) => <button key={index} onClick={() => setSelectedPage(index)}>{index + 1}</button>)}
+        </div>)
+    }else{
+      return(<p>Loading...</p>)
+    }
   };
 
   if(props.guessedlistlength === 20){
+    //{isOnline ? currentScores.map((score, i) => <p key={i}>Name: {score.name} Correct: {score.results.correct} Wrong: {score.results.wrong}</p>) : <p>Loading other player results...</p>}
+    //TODO: Submit result only once!
     return(
       <div>
         <div>
@@ -156,10 +221,7 @@ const RenderQuestion = (props) =>{
         <p>Results</p>
         <p>Correct: {props.progress.correct} Wrong: {props.progress.wrong}</p>
         </div>
-        <div>
-          <SetSubmit submit={handleScoreSubmit} change={handleNameChange} val={name}/>
-          {currentScores.map((score, i) => <p key={i}>Name: {score.name} Correct: {score.results.correct} Wrong: {score.results.wrong}</p>)}
-        </div>
+        <PlayerResults/>
       </div>
     )
   }else{
@@ -171,7 +233,6 @@ const RenderQuestion = (props) =>{
       </div>
     )
   }
-
 };
 
 const App = () => {
