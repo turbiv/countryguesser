@@ -57,14 +57,6 @@ const Question = () =>{
 
   const handleGuessSubmit = (event) =>{
     event.preventDefault();
-    console.log("asd");
-    console.log("Handle Guess submit");
-    console.log(displayRandomCountry);
-    console.log(question);
-    console.log(answer);
-    console.log(progress);
-    console.log("-----");
-
     if(!guessedCountries.includes(displayRandomCountry.name)){
       if(guessValue === undefined){
         getnewcountry();
@@ -110,7 +102,6 @@ const Question = () =>{
   const getnewcountry = () =>{
     const randomcountryindex = Math.floor(Math.random() * countries.length);
     const country = countries[randomcountryindex];
-    console.log(guessedCountries);
     if(!guessedCountries.includes(country.name)){
       setDisplayRandomCountry(country);
       handleQandA(country)
@@ -176,20 +167,16 @@ const RenderQuestion = (props) =>{
   };
 
   const handleAllResults = () =>{
-    var pageScores = [];
-    var allPageScores = [];
+    let pageScores = [];
+    let allPageScores = [];
     currentScores.map((score, i) => {
-      if ((i % 2) === 0 && i !== 0){
+      if ((i % 5) === 0 && i !== 0){
         allPageScores.push(pageScores);
-        console.log("allscres", allPageScores);
-        console.log("pagescores", pageScores);
         pageScores = []
       }
       pageScores.push(<p key={i}>Name: {score.name} Correct: {score.results.correct} Wrong: {score.results.wrong}</p>);
     });
     allPageScores.push(pageScores);
-    console.log("ALL PAGE SCORES");
-    console.log(allPageScores);
     return allPageScores
   };
 
@@ -198,13 +185,41 @@ const RenderQuestion = (props) =>{
     return allResults[selected]
   };
 
+  const Pages = () =>{
+    if(handleAllResults().length > 5){
+
+      handleAllResults().forEach((val, index) => {
+        let array = [];
+          if(array.length !== 2){
+            array.push(selectedPage + 1)
+          }
+          if(array.length >= 2){
+            array.push(selectedPage - 1)
+          }
+      });
+
+      return(
+        <div>
+          <p>Testing</p>
+        </div>
+      )
+    }else {
+      return (
+        <div>
+          <button onClick={() => selectedPage !== 0 ? setSelectedPage(selectedPage - 1) : null}>{'<<'}</button>
+          {handleAllResults().map((n, index) => <button key={index} onClick={() => setSelectedPage(index)}>{index + 1}</button>)}
+          <button onClick={() => handleAllResults().length !== selectedPage + 1 ? setSelectedPage(selectedPage + 1) : null}>{'>>'}</button>
+        </div>
+      )
+    }
+  };
+
   const PlayerResults = () =>{
     if(isOnline) {
       return (
         <div>
-          {handlePlayerSubmit()}
           {handlePages(selectedPage).map((result) => result)}
-          {handleAllResults().map((n, index) => <button key={index} onClick={() => setSelectedPage(index)}>{index + 1}</button>)}
+          <Pages/>
         </div>)
     }else{
       return(<p>Loading...</p>)
@@ -212,8 +227,6 @@ const RenderQuestion = (props) =>{
   };
 
   if(props.guessedlistlength === 20){
-    //{isOnline ? currentScores.map((score, i) => <p key={i}>Name: {score.name} Correct: {score.results.correct} Wrong: {score.results.wrong}</p>) : <p>Loading other player results...</p>}
-    //TODO: Submit result only once!
     return(
       <div>
         <div>
@@ -221,6 +234,7 @@ const RenderQuestion = (props) =>{
         <p>Results</p>
         <p>Correct: {props.progress.correct} Wrong: {props.progress.wrong}</p>
         </div>
+        {handlePlayerSubmit()}
         <PlayerResults/>
       </div>
     )
