@@ -186,21 +186,37 @@ const RenderQuestion = (props) =>{
   };
 
   const Pages = () =>{
+    const [minimizedPagesState, setMinimizedPagesState] = useState([]);
     if(handleAllResults().length > 5){
+      let minimizedPagesIndex = [];
+      let resultsLength = handleAllResults().length;
+      let currentSelectedPage = selectedPage;
+      let iterator = 0;
+      while (minimizedPagesIndex.length !== 4) {
+        if (minimizedPagesIndex.length <= 2 && (currentSelectedPage <= minimizedPagesState[2])) {
+          minimizedPagesIndex.push(currentSelectedPage = currentSelectedPage + 1)
+        }else{
+          minimizedPagesIndex.push(minimizedPagesState[iterator]);
+          iterator = iterator + 1
+        }
 
-      handleAllResults().forEach((val, index) => {
-        let array = [];
-          if(array.length !== 2){
-            array.push(selectedPage + 1)
-          }
-          if(array.length >= 2){
-            array.push(selectedPage - 1)
-          }
-      });
-
+        //TODO: fix this ugly ass looking messss
+        if (minimizedPagesIndex.length === 2) {
+          minimizedPagesIndex.push(resultsLength - 2)
+        }
+        if (minimizedPagesIndex.length === 3) {
+          minimizedPagesIndex.push(resultsLength - 1)
+        }
+      }
+      setMinimizedPagesState(minimizedPagesState.concat(minimizedPagesIndex))
+      console.log(selectedPage)
+      console.log(minimizedPagesIndex);
+      console.log(handleAllResults().length)
       return(
         <div>
-          <p>Testing</p>
+          <button onClick={() => selectedPage !== 0 ? setSelectedPage(selectedPage - 1) : null}>{'<<'}</button>
+          {minimizedPagesIndex.map((n, index) => <button key={index} onClick={() => setSelectedPage(minimizedPagesIndex[index])}>{minimizedPagesIndex[index] + 1}</button>)}
+          <button onClick={() => handleAllResults().length !== selectedPage + 1 ? setSelectedPage(selectedPage + 1) : null}>{'>>'}</button>
         </div>
       )
     }else {
