@@ -186,32 +186,39 @@ const RenderQuestion = (props) =>{
   };
 
   const Pages = () =>{
-    const [minimizedPagesState, setMinimizedPagesState] = useState([]);
     if(handleAllResults().length > 5){
       let minimizedPagesIndex = [];
       let resultsLength = handleAllResults().length;
       let currentSelectedPage = selectedPage;
       let iterator = 0;
-      while (minimizedPagesIndex.length !== 4) {
-        if (minimizedPagesIndex.length <= 2 && (currentSelectedPage <= minimizedPagesState[2])) {
-          minimizedPagesIndex.push(currentSelectedPage = currentSelectedPage + 1)
-        }else{
-          minimizedPagesIndex.push(minimizedPagesState[iterator]);
-          iterator = iterator + 1
+        //TODO:
+        //Get 4 digits next to the current page ie. 6 7 ->8<- 9 10
+        //Display current page in bolded digit
+        //Last page number and first page number
+        //In future , have "..." between last and first
+
+        if(currentSelectedPage >= 3){
+          while(minimizedPagesIndex.length !== 3){
+            minimizedPagesIndex.push(currentSelectedPage = currentSelectedPage - 1)
+          }
         }
 
-        //TODO: fix this ugly ass looking messss
-        if (minimizedPagesIndex.length === 2) {
-          minimizedPagesIndex.push(resultsLength - 2)
-        }
-        if (minimizedPagesIndex.length === 3) {
-          minimizedPagesIndex.push(resultsLength - 1)
+      if(currentSelectedPage <= (resultsLength - 2)){
+        while(minimizedPagesIndex.length !== 3){
+          minimizedPagesIndex.push(currentSelectedPage = currentSelectedPage - 1)
         }
       }
-      setMinimizedPagesState(minimizedPagesState.concat(minimizedPagesIndex))
-      console.log(selectedPage)
+
+
+      //TODO: fix this ugly ass looking messss
+      //Get last page number
+      minimizedPagesIndex.push(resultsLength - 1);
+
+
+
+      console.log(selectedPage);
       console.log(minimizedPagesIndex);
-      console.log(handleAllResults().length)
+      console.log(handleAllResults().length);
       return(
         <div>
           <button onClick={() => selectedPage !== 0 ? setSelectedPage(selectedPage - 1) : null}>{'<<'}</button>
@@ -274,3 +281,14 @@ const App = () => {
 };
 
 ReactDOM.render(<App />, document.getElementById('root'));
+
+
+/*
+if (minimizedPagesIndex.length <= 2 && (currentSelectedPage <= minimizedPagesState[2])) {
+  minimizedPagesIndex.push(currentSelectedPage = currentSelectedPage + 1)
+  console.log("first if", currentSelectedPage = currentSelectedPage + 1)
+}else{
+  minimizedPagesIndex.push(minimizedPagesState[iterator]);
+  console.log("second if", iterator)
+  iterator = iterator + 1
+}*/
