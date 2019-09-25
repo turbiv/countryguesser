@@ -284,24 +284,3 @@ const App = () => {
 };
 
 ReactDOM.render(<App />, document.getElementById('root'));
-
-
-/*
-      if (minimizedPagesIndex.length === 0) {
-        minimizedPagesIndex.push(selectedPage)
-      }
-      if (minimizedPagesIndex.length === 1) {
-        minimizedPagesIndex.push(selectedPage + 1)
-      }
-
-
-      if(selectedPage <= (resultsLength - 2)){
-        if(selectedPage === 7) {
-          minimizedPagesIndex.push(selectedPage + 1);
-          minimizedPagesIndex.push(selectedPage + 2);
-        }else{
-          minimizedPagesIndex.push(resultsLength - 3)
-          minimizedPagesIndex.push(resultsLength - 2)
-        }
-      }
-}*/
