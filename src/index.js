@@ -174,7 +174,7 @@ const RenderQuestion = (props) =>{
         allPageScores.push(pageScores);
         pageScores = []
       }
-      pageScores.push(<p key={i}>Name: {score.name} Correct: {score.results.correct} Wrong: {score.results.wrong}</p>);
+      return pageScores.push(<p key={i}>Name: {score.name} Correct: {score.results.correct} Wrong: {score.results.wrong}</p>);
     });
     allPageScores.push(pageScores);
     return allPageScores
@@ -186,43 +186,46 @@ const RenderQuestion = (props) =>{
   };
 
   const Pages = () =>{
-    if(handleAllResults().length > 5){
+    if(handleAllResults().length > 7){
       let minimizedPagesIndex = [];
       let resultsLength = handleAllResults().length;
-      let currentSelectedPage = selectedPage;
-      let iterator = 0;
-        //TODO:
-        //Get 4 digits next to the current page ie. 6 7 ->8<- 9 10
-        //Display current page in bolded digit
-        //Last page number and first page number
-        //In future , have "..." between last and first
+      //TODO:
+      //Get 4 digits next to the current page ie. 5 6 7 ->8<- 9 10 11
+      //Display current page in bolded digit
+      //Last page number and first page number
+      //In future , have "..." between last and first
 
-        if(currentSelectedPage >= 3){
-          while(minimizedPagesIndex.length !== 3){
-            minimizedPagesIndex.push(currentSelectedPage = currentSelectedPage - 1)
-          }
+      if(selectedPage < 3){
+        const firstpages = [0,1,2,3,4,5];
+        firstpages.forEach((item, iterator) => minimizedPagesIndex.push(iterator))
+      }else{
+        minimizedPagesIndex.push(selectedPage - 2);
+        minimizedPagesIndex.push(selectedPage - 1);
+        minimizedPagesIndex.push(selectedPage);
+        if(selectedPage < resultsLength - 1){
+          minimizedPagesIndex.push(selectedPage + 1)
         }
-
-      if(currentSelectedPage <= (resultsLength - 2)){
-        while(minimizedPagesIndex.length !== 3){
-          minimizedPagesIndex.push(currentSelectedPage = currentSelectedPage - 1)
+        if(selectedPage < resultsLength - 2){
+          minimizedPagesIndex.push(selectedPage + 2)
         }
       }
 
 
-      //TODO: fix this ugly ass looking messss
-      //Get last page number
-      minimizedPagesIndex.push(resultsLength - 1);
-
-
-
-      console.log(selectedPage);
-      console.log(minimizedPagesIndex);
-      console.log(handleAllResults().length);
+      console.log("Selected page: " , selectedPage);
+      console.log("Listed pages: ", minimizedPagesIndex);
+      console.log("List length: ", handleAllResults().length);
       return(
         <div>
           <button onClick={() => selectedPage !== 0 ? setSelectedPage(selectedPage - 1) : null}>{'<<'}</button>
-          {minimizedPagesIndex.map((n, index) => <button key={index} onClick={() => setSelectedPage(minimizedPagesIndex[index])}>{minimizedPagesIndex[index] + 1}</button>)}
+          <button onClick={() => setSelectedPage(0)}>{selectedPage >= 3 ?  "1" : null}</button>
+          <span>{selectedPage >= 3 ?  "..." : null}</span>
+          {minimizedPagesIndex.map((n, index) => {
+            if(minimizedPagesIndex[index] === selectedPage){
+             return <button key={index} onClick={() => setSelectedPage(minimizedPagesIndex[index])}>{minimizedPagesIndex[index] + 1} bold</button>
+            }
+            return <button key={index} onClick={() => setSelectedPage(minimizedPagesIndex[index])}>{minimizedPagesIndex[index] + 1}</button>})}
+          <span>{selectedPage <= resultsLength - 4  ?  "..." : null}</span>
+          <button onClick={() => setSelectedPage(resultsLength - 1)}>{selectedPage <= resultsLength - 4 ?  resultsLength : null}</button>
           <button onClick={() => handleAllResults().length !== selectedPage + 1 ? setSelectedPage(selectedPage + 1) : null}>{'>>'}</button>
         </div>
       )
@@ -284,11 +287,21 @@ ReactDOM.render(<App />, document.getElementById('root'));
 
 
 /*
-if (minimizedPagesIndex.length <= 2 && (currentSelectedPage <= minimizedPagesState[2])) {
-  minimizedPagesIndex.push(currentSelectedPage = currentSelectedPage + 1)
-  console.log("first if", currentSelectedPage = currentSelectedPage + 1)
-}else{
-  minimizedPagesIndex.push(minimizedPagesState[iterator]);
-  console.log("second if", iterator)
-  iterator = iterator + 1
+      if (minimizedPagesIndex.length === 0) {
+        minimizedPagesIndex.push(selectedPage)
+      }
+      if (minimizedPagesIndex.length === 1) {
+        minimizedPagesIndex.push(selectedPage + 1)
+      }
+
+
+      if(selectedPage <= (resultsLength - 2)){
+        if(selectedPage === 7) {
+          minimizedPagesIndex.push(selectedPage + 1);
+          minimizedPagesIndex.push(selectedPage + 2);
+        }else{
+          minimizedPagesIndex.push(resultsLength - 3)
+          minimizedPagesIndex.push(resultsLength - 2)
+        }
+      }
 }*/
