@@ -14,12 +14,11 @@ const SetSubmit = ({submit, change, val}) =>{
   )
 };
 
-const RenderResults = (props) =>{
+const RenderResults = ({guessedlistlength, question, guessValue, guesshandle, change, country, progress}) =>{
   const [name, setName] = useState("");
   const [currentScores, setCurrentScores] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
-  const [selectedPage, setSelectedPage] = useState(0);
 
   useEffect(()=>{
     Countries
@@ -34,11 +33,10 @@ const RenderResults = (props) =>{
 
   const handleScoreSubmit = event =>{
     console.log("Handle score submit");
-    handleAllResults();
     event.preventDefault();
     const addscore = {
       name: name,
-      results: props.progress
+      results: progress
     };
     Countries
       .addScore(addscore)
@@ -54,6 +52,43 @@ const RenderResults = (props) =>{
     }
   };
 
+  if(guessedlistlength === 20){
+    return(
+      <div>
+        <div>
+          <p>Game over</p>
+          <p>Results</p>
+          <p>Correct: {progress.correct} Wrong: {progress.wrong}</p>
+        </div>
+        {handlePlayerSubmit()}
+        <PlayerScoreBoard onlineStatus={isOnline} currentScores={currentScores}/>
+      </div>
+    )
+  }else{
+    return(
+      <div>
+        <p>Question:{guessedlistlength}/20</p>
+        <p>What is the {question} of {country}</p>
+        <SetSubmit submit={guesshandle} change={change} val={guessValue}/>
+      </div>
+    )
+  }
+};
+
+const PlayerScoreBoard = ({onlineStatus, currentScores}) =>{
+  if(onlineStatus) {
+    return (
+      <div>
+        <ScoreBoard currentScores={currentScores}/>
+      </div>)
+  }else{
+    return(<p>Loading...</p>)
+  }
+
+};
+
+const ScoreBoard = ({currentScores}) =>{
+  const [selectedPage, setSelectedPage] = useState(0);
   const handleAllResults = () =>{
     let pageScores = [];
     let allPageScores = [];
@@ -73,93 +108,69 @@ const RenderResults = (props) =>{
     return allResults[selected]
   };
 
-  const Pages = () =>{
-    if(handleAllResults().length > 7){
-      let minimizedPagesIndex = [];
-      let resultsLength = handleAllResults().length;
-      //TODO:
-      //Get 4 digits next to the current page ie. 5 6 7 ->8<- 9 10 11
-      //Display current page in bolded digit
-      //Last page number and first page number
-      //In future , have "..." between last and first
+  //This can be used a separate component on another project
 
-      if(selectedPage < 3){
-        const firstpages = [0,1,2,3,4,5];
-        firstpages.forEach((item, iterator) => minimizedPagesIndex.push(iterator))
-      }else{
-        minimizedPagesIndex.push(selectedPage - 2);
-        minimizedPagesIndex.push(selectedPage - 1);
-        minimizedPagesIndex.push(selectedPage);
-        if(selectedPage < resultsLength - 1){
-          minimizedPagesIndex.push(selectedPage + 1)
-        }
-        if(selectedPage < resultsLength - 2){
-          minimizedPagesIndex.push(selectedPage + 2)
-        }
+  if (handleAllResults().length > 7) {
+    let minimizedPagesIndex = [];
+    let resultsLength = handleAllResults().length;
+    //TODO:
+    //Get 4 digits next to the current page ie. 5 6 7 ->8<- 9 10 11
+    //Display current page in bolded digit
+    //Last page number and first page number
+    //In future , have "..." between last and first
+
+    if (selectedPage < 3) {
+      const firstpages = [0, 1, 2, 3, 4, 5];
+      firstpages.forEach((item, iterator) => minimizedPagesIndex.push(iterator))
+    } else {
+      minimizedPagesIndex.push(selectedPage - 2);
+      minimizedPagesIndex.push(selectedPage - 1);
+      minimizedPagesIndex.push(selectedPage);
+      if (selectedPage < resultsLength - 1) {
+        minimizedPagesIndex.push(selectedPage + 1)
       }
-
-
-      console.log("Selected page: " , selectedPage);
-      console.log("Listed pages: ", minimizedPagesIndex);
-      console.log("List length: ", handleAllResults().length);
-      return(
-        <div>
-          <button onClick={() => selectedPage !== 0 ? setSelectedPage(selectedPage - 1) : null}>{'<<'}</button>
-          <button onClick={() => setSelectedPage(0)}>{selectedPage >= 3 ?  "1" : null}</button>
-          <span>{selectedPage >= 3 ?  "..." : null}</span>
-          {minimizedPagesIndex.map((n, index) => {
-            if(minimizedPagesIndex[index] === selectedPage){
-              return <button key={index} onClick={() => setSelectedPage(minimizedPagesIndex[index])}>{minimizedPagesIndex[index] + 1} bold</button>}
-            return <button key={index} onClick={() => setSelectedPage(minimizedPagesIndex[index])}>{minimizedPagesIndex[index] + 1}</button>})}
-          <span>{selectedPage <= resultsLength - 4  ?  "..." : null}</span>
-          <button onClick={() => setSelectedPage(resultsLength - 1)}>{selectedPage <= resultsLength - 4 ?  resultsLength : null}</button>
-          <button onClick={() => handleAllResults().length !== selectedPage + 1 ? setSelectedPage(selectedPage + 1) : null}>{'>>'}</button>
-        </div>
-      )
-    }else {
-      return (
-        <div>
-          <button onClick={() => selectedPage !== 0 ? setSelectedPage(selectedPage - 1) : null}>{'<<'}</button>
-          {handleAllResults().map((n, index) => <button key={index} onClick={() => setSelectedPage(index)}>{index + 1}</button>)}
-          <button onClick={() => handleAllResults().length !== selectedPage + 1 ? setSelectedPage(selectedPage + 1) : null}>{'>>'}</button>
-        </div>
-      )
+      if (selectedPage < resultsLength - 2) {
+        minimizedPagesIndex.push(selectedPage + 2)
+      }
     }
-  };
 
-  const PlayerResults = () =>{
-    if(isOnline) {
-      return (
-        <div>
-          {handlePages(selectedPage).map((result) => result)}
-          <Pages/>
-        </div>)
-    }else{
-      return(<p>Loading...</p>)
-    }
-  };
 
-  if(props.guessedlistlength === 20){
-    return(
+    console.log("Selected page: ", selectedPage);
+    console.log("Listed pages: ", minimizedPagesIndex);
+    return (
       <div>
-        <div>
-          <p>Game over</p>
-          <p>Results</p>
-          <p>Correct: {props.progress.correct} Wrong: {props.progress.wrong}</p>
-        </div>
-        {handlePlayerSubmit()}
-        <PlayerResults/>
+        {handlePages(selectedPage).map((result) => result)}
+        <button onClick={() => selectedPage !== 0 ? setSelectedPage(selectedPage - 1) : null}>{'<<'}</button>
+        <button onClick={() => setSelectedPage(0)}>{selectedPage >= 3 ? "1" : null}</button>
+        <span>{selectedPage >= 3 ? "..." : null}</span>
+        {minimizedPagesIndex.map((n, index) => {
+          if (minimizedPagesIndex[index] === selectedPage) {
+            return <button key={index}
+                           onClick={() => setSelectedPage(minimizedPagesIndex[index])}>{minimizedPagesIndex[index] + 1} bold</button>
+          }
+          return <button key={index}
+                         onClick={() => setSelectedPage(minimizedPagesIndex[index])}>{minimizedPagesIndex[index] + 1}</button>
+        })}
+        <span>{selectedPage <= resultsLength - 4 ? "..." : null}</span>
+        <button
+          onClick={() => setSelectedPage(resultsLength - 1)}>{selectedPage <= resultsLength - 4 ? resultsLength : null}</button>
+        <button
+          onClick={() => handleAllResults().length !== selectedPage + 1 ? setSelectedPage(selectedPage + 1) : null}>{'>>'}</button>
       </div>
     )
-  }else{
-    return(
+  } else {
+    return (
       <div>
-        <p>Question:{props.guessedlistlength}/20</p>
-        <p>What is the {props.question} of {props.country}</p>
-        <SetSubmit submit={props.guesshandle} change={props.change} val={props.guessValue}/>
+        {handlePages(selectedPage).map((result) => result)}
+        <button onClick={() => selectedPage !== 0 ? setSelectedPage(selectedPage - 1) : null}>{'<<'}</button>
+        {handleAllResults().map((n, index) => <button key={index}
+                                              onClick={() => setSelectedPage(index)}>{index + 1}</button>)}
+        <button
+          onClick={() => handleAllResults().length !== selectedPage + 1 ? setSelectedPage(selectedPage + 1) : null}>{'>>'}</button>
       </div>
     )
   }
 };
+
 
 export default RenderResults
