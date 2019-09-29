@@ -14,7 +14,7 @@ const SetSubmit = ({submit, change, val}) =>{
   )
 };
 
-const RenderResults = ({guessedlistlength, question, guessValue, guesshandle, change, country, progress}) =>{
+const RenderResults = ({guessedlistlength, questionstring, guessValue, guesshandle, change, progress}) =>{
   const [name, setName] = useState("");
   const [currentScores, setCurrentScores] = useState([]);
   const [submitted, setSubmitted] = useState(false);
@@ -68,7 +68,7 @@ const RenderResults = ({guessedlistlength, question, guessValue, guesshandle, ch
     return(
       <div>
         <p>Question:{guessedlistlength}/20</p>
-        <p>What is the {question} of {country}</p>
+        <p>What is the {questionstring}</p>
         <SetSubmit submit={guesshandle} change={change} val={guessValue}/>
       </div>
     )
