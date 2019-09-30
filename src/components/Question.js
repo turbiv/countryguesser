@@ -5,14 +5,13 @@ import RenderResults from "../components/Results"
 
 const Question = () =>{
   const [countries, setCountries] = useState([]);
-  const [guessedCountries, setGuessedCountries] = useState([]);
-  const [guessValue, setGuessValue] = useState('');
+  const [guess, setGuess] = useState({value: "", guessedCountries: []});
   const [question, setQuestion] = useState({question: "", answer: "", questiondisplay: ""});
   const [progress, setProgress] = useState({"correct":0, "wrong":0});
   const [isOnline, setIsOnline] = useState(false);
 
   const handleUsernameChange = (event) =>{
-    setGuessValue(event.target.value)
+    setGuess({...guess ,value: event.target.value})
   };
   //TODO: redo question strings (too confusion)
   const handleQandA = (country) =>{
@@ -40,12 +39,12 @@ const Question = () =>{
 
   const handleGuessSubmit = (event) =>{
     event.preventDefault();
-    if(!guessedCountries.includes(question.answer)){
-      if(guessValue === undefined){
+    if(!guess.guessedCountries.includes(question.answer)){
+      if(guess.value === undefined){
         getnewcountry();
       }
 
-      if(guessValue.replace(/\s/g, '').toLowerCase() === question.answer.replace(/\s/g, '').toLowerCase()){
+      if(guess.value.replace(/\s/g, '').toLowerCase() === question.answer.replace(/\s/g, '').toLowerCase()){
         const newProgess = {
           ...progress,
           correct: progress.correct +1
@@ -76,17 +75,19 @@ const Question = () =>{
       }
       getnewcountry();
 
-      setGuessedCountries(guessedCountries.concat(question.answer));
+      //This dont work?
+      setGuess({...guess, guessedCountries: guess.guessedCountries.concat(question.answer)});
     }else{
       getnewcountry();
     }
-    setGuessValue("")
+    setGuess({...guess, value: ""})
   };
 
   const getnewcountry = () =>{
+    console.log(guess.guessedCountries)
     const randomcountryindex = Math.floor(Math.random() * countries.length);
     const country = countries[randomcountryindex];
-    if(!guessedCountries.includes(country.name)){
+    if(!guess.guessedCountries.includes(country.name)){
       handleQandA(country)
     }else{
       getnewcountry()
@@ -94,12 +95,13 @@ const Question = () =>{
   };
 
   if(isOnline) {
+    console.log(guess)
     return (
       <div>
         <ReactNotification/>
-        <RenderResults progress={progress} questionstring={"What is the " + question.question + " of " + question.questiondisplay} guessValue={guessValue} guesshandle={handleGuessSubmit}
+        <RenderResults progress={progress} questionstring={"What is the " + question.question + " of " + question.questiondisplay} guessValue={guess.value} guesshandle={handleGuessSubmit}
                        change={handleUsernameChange}
-                       guessedlistlength={guessedCountries.length}/>
+                       guessedlistlength={guess.guessedCountries.length}/>
       </div>
     );
   }else{
