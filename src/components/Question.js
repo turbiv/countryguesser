@@ -7,9 +7,7 @@ const Question = () =>{
   const [countries, setCountries] = useState([]);
   const [guessedCountries, setGuessedCountries] = useState([]);
   const [guessValue, setGuessValue] = useState('');
-  const [displayRandomCountry, setDisplayRandomCountry] = useState("");
   const [question, setQuestion] = useState({question: "", answer: "", questiondisplay: ""});
-  const [answer, setAnswer] = useState("");
   const [progress, setProgress] = useState({"correct":0, "wrong":0});
   const [isOnline, setIsOnline] = useState(false);
 
@@ -18,10 +16,11 @@ const Question = () =>{
   };
   //TODO: redo question strings (too confusion)
   const handleQandA = (country) =>{
-    const country_data = [[country.name, "capital", country.capital], [country.capital, "country capital", country.name]];
+    //[answer, string displayed on question, asked target]
+    const country_data = [[country.name, "country", country.capital], [country.capital, "capital", country.name]];
     //country.currencies.forEach(cur => country_data.push(cur.name))
     const randitem = country_data[Math.floor(Math.random()*country_data.length)];
-    setQuestion({question: randitem[1], answer: randitem[0], questiondisplay: randitem[2]});
+    setQuestion({answer: randitem[0], question: randitem[1], questiondisplay: randitem[2]});
   };
 
   useEffect(() =>{
@@ -35,7 +34,7 @@ const Question = () =>{
         console.log(response[randomcountryindex]);
         setCountries(response);
         setIsOnline(true);
-        return setDisplayRandomCountry(response[randomcountryindex])
+        return response[randomcountryindex]
       });
   },[]);
 
@@ -46,7 +45,7 @@ const Question = () =>{
         getnewcountry();
       }
 
-      if(guessValue.toLowerCase() === question.answer.toLowerCase()){
+      if(guessValue.replace(/\s/g, '').toLowerCase() === question.answer.replace(/\s/g, '').toLowerCase()){
         const newProgess = {
           ...progress,
           correct: progress.correct +1
@@ -88,7 +87,6 @@ const Question = () =>{
     const randomcountryindex = Math.floor(Math.random() * countries.length);
     const country = countries[randomcountryindex];
     if(!guessedCountries.includes(country.name)){
-      setDisplayRandomCountry(country);
       handleQandA(country)
     }else{
       getnewcountry()
@@ -99,7 +97,7 @@ const Question = () =>{
     return (
       <div>
         <ReactNotification/>
-        <RenderResults progress={progress} questionstring={question.question + " " + question.questiondisplay} guessValue={guessValue} guesshandle={handleGuessSubmit}
+        <RenderResults progress={progress} questionstring={"What is the " + question.question + " of " + question.questiondisplay} guessValue={guessValue} guesshandle={handleGuessSubmit}
                        change={handleUsernameChange}
                        guessedlistlength={guessedCountries.length}/>
       </div>

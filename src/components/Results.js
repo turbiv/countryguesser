@@ -68,7 +68,7 @@ const RenderResults = ({guessedlistlength, questionstring, guessValue, guesshand
     return(
       <div>
         <p>Question:{guessedlistlength}/20</p>
-        <p>What is the {questionstring}</p>
+        <p>{questionstring}</p>
         <SetSubmit submit={guesshandle} change={change} val={guessValue}/>
       </div>
     )
