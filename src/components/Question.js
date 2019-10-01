@@ -74,17 +74,15 @@ const Question = () =>{
         console.log("Guess was incorrect :(")
       }
       getnewcountry();
-
-      //This dont work?
-      setGuess({...guess, guessedCountries: guess.guessedCountries.concat(question.answer)});
+      setGuess({value: "", guessedCountries: guess.guessedCountries.concat(question.answer)});
     }else{
+      setGuess({...guess, value: ""});
       getnewcountry();
     }
-    setGuess({...guess, value: ""})
   };
 
   const getnewcountry = () =>{
-    console.log(guess.guessedCountries)
+    console.log(guess.guessedCountries);
     const randomcountryindex = Math.floor(Math.random() * countries.length);
     const country = countries[randomcountryindex];
     if(!guess.guessedCountries.includes(country.name)){
