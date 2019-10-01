@@ -32,7 +32,6 @@ const RenderResults = ({guessedlistlength, questionstring, guessValue, guesshand
   };
 
   const handleScoreSubmit = event =>{
-    console.log("Handle score submit");
     event.preventDefault();
     const addscore = {
       name: name,
@@ -134,9 +133,6 @@ const ScoreBoard = ({currentScores}) =>{
       }
     }
 
-
-    console.log("Selected page: ", selectedPage);
-    console.log("Listed pages: ", minimizedPagesIndex);
     return (
       <div>
         {handlePages(selectedPage).map((result) => result)}

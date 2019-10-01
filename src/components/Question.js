@@ -29,8 +29,6 @@ const Question = () =>{
       .then(response => {
         const randomcountryindex = Math.floor(Math.random() * response.length);
         handleQandA(response[randomcountryindex]);
-        console.log("Get random country");
-        console.log(response[randomcountryindex]);
         setCountries(response);
         setIsOnline(true);
         return response[randomcountryindex]
@@ -50,7 +48,6 @@ const Question = () =>{
           correct: progress.correct +1
         };
         setProgress(newProgess);
-        console.log("Guess was correct!")
       }else{
         const newProgess = {
           ...progress,
@@ -71,7 +68,6 @@ const Question = () =>{
             onScreen: true
           }
         });
-        console.log("Guess was incorrect :(")
       }
       getnewcountry();
       setGuess({value: "", guessedCountries: guess.guessedCountries.concat(question.answer)});
@@ -82,7 +78,6 @@ const Question = () =>{
   };
 
   const getnewcountry = () =>{
-    console.log(guess.guessedCountries);
     const randomcountryindex = Math.floor(Math.random() * countries.length);
     const country = countries[randomcountryindex];
     if(!guess.guessedCountries.includes(country.name)){
@@ -93,7 +88,6 @@ const Question = () =>{
   };
 
   if(isOnline) {
-    console.log(guess)
     return (
       <div>
         <ReactNotification/>
