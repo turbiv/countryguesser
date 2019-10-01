@@ -1,1 +1,4 @@
-https://warm-retreat-88184.herokuapp.com/
+npm install
+
+npm run fronted
+npm run watch
