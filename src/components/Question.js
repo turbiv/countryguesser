@@ -97,7 +97,7 @@ const Question = () =>{
     return (
       <div>
         <ReactNotification/>
-        <RenderResults progress={progress} questionstring={"What is the " + question.question + " of " + question.questiondisplay} guessValue={guess.value} guesshandle={handleGuessSubmit}
+        <RenderResults progress={progress} questionstring={`What is the ${question.question} of ${question.questiondisplay}`} guessValue={guess.value} guesshandle={handleGuessSubmit}
                        change={handleUsernameChange}
                        guessedlistlength={guess.guessedCountries.length}/>
       </div>
